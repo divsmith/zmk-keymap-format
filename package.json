@@ -1,0 +1,60 @@
+{
+  "name": "zmk-keymap-format",
+  "displayName": "ZMK Keymap Format",
+  "description": "A formatter for ZMK keymap files",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "activationEvents": [
+    "onLanguage:keymap"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "keymap",
+        "aliases": [
+          "ZMK Keymap",
+          "keymap"
+        ],
+        "extensions": [
+          ".keymap"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [],
+    "configuration": {
+      "type": "object",
+      "title": "ZMK Keymap Format Configuration",
+      "properties": {
+        "zmkKeymapFormat.maxLineWidth": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum line width for formatting"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "mocha out/test/unit/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/glob": "^8.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.3",
+    "mocha": "^10.1.0"
+  }
+}
