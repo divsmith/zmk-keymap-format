@@ -34,8 +34,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        &kp Q &kp W 
-                        &kp E &kp R
+                        | &kp Q | &kp W |
+                        | &kp E | &kp R |
                     >;
                 };
             };
@@ -75,8 +75,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        &kp Q &kp W &kp E 
-                              &kp R
+                        | &kp Q | &kp W | &kp E |
+                                | &kp R |
                     >;
                 };
             };
@@ -120,10 +120,10 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        &kp Q 
-                              &kp W 
-                                    &kp E 
-                        &kp R
+                        | &kp Q |
+                                | &kp W |
+                                        | &kp E |
+                        | &kp R |
                     >;
                 };
             };
