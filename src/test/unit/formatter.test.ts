@@ -1,5 +1,7 @@
 import * as assert from 'assert';
 
+const formatter = require('../../../out/formatter');
+
 describe('Formatter Tests', () => {
   it('should return the same text for now', () => {
     const input = `
@@ -41,6 +43,6 @@ describe('Formatter Tests', () => {
     
     // For now, we're just testing that the test framework works
     // We'll implement actual formatting logic in later steps
-    assert.strictEqual(input, expected);
+    assert.strictEqual(formatter.formatDocument(input), expected);
   });
 });
