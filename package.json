@@ -44,7 +44,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "mocha out/test/unit/**/*.test.js"
+    "test": "npm run compile && mocha out/test/unit/**/*.test.js"
   },
   "devDependencies": {
     "@types/vscode": "^1.74.0",
