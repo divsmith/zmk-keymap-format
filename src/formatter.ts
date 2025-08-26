@@ -181,16 +181,21 @@ export function formatDocument(text: string): string {
         
         if (anyBindingWithoutKey) {
           // If any binding has no key, just add a single space between macro and key
-          return binding.macro + ' ' + binding.key;
+          const formattedBinding = binding.macro + ' ' + binding.key;
+          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
+          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
         } else {
-          // If all bindings have keys, align the macros within each column
-          // Add padding spaces between macro and key to align macros
+          // If all bindings have keys, align the macros and keys within each column separately
           const macroPadding = columnMacroWidths[colIndex] - binding.macro.length;
-          return binding.macro + ' '.repeat(macroPadding + 1) + binding.key;
+          const keyPadding = columnKeyWidths[colIndex] - binding.key.length;
+          // Add a space between macro and key, then pad both parts
+          const formattedBinding = binding.macro + ' '.repeat(macroPadding + 1) + binding.key + ' '.repeat(keyPadding);
+          return formattedBinding;
         }
       } else {
-        // For bindings without keys, return as is
-        return binding.original;
+        // For bindings without keys, just pad to match column width
+        const totalPadding = columnWidths[colIndex] - binding.width;
+        return binding.original + ' '.repeat(Math.max(0, totalPadding));
       }
     });
     
@@ -222,8 +227,12 @@ export function formatDocument(text: string): string {
       
       // Join the bindings with a single space
       let processedLine = lineBindings.join(' ');
-      // Only trim trailing whitespace if it's not part of the expected column alignment
-      // For now, let's preserve the original trailing whitespace behavior for the last binding in a line
+      // Remove trailing whitespace from the line
+      processedLine = processedLine.trimEnd();
+      
+      // Apply proper indentation: base content indentation + normalized relative indentation
+      const totalIndentation = contentIndentation + (normalizedIndentations[i] || 0);
+      formattedBindings += ' '.repeat(totalIndentation) + processedLine;
     }
     
     // Handle any remaining bindings that weren't placed in the template
