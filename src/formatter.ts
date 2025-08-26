@@ -71,7 +71,7 @@ export function formatDocument(text: string): string {
       
       // Get the content after // and process it
       const templateLine = templateLines[i];
-      const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2);
+      const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
       
       // Replace all * with corresponding bindings in this line
       let processedLine = contentAfterComment;
