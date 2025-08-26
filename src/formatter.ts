@@ -173,25 +173,24 @@ export function formatDocument(text: string): string {
       
       // Format the binding with proper alignment
       if (binding.key) {
-        // For bindings, check if we need to align keys within the column
-        // Only align macros if all keys in the column have the same length
+        // For bindings with keys, check if we need to align within the column
         const column = columnBindings[colIndex] || [];
-        const keysInColumn = column.filter(b => b.key).map(b => b.key);
-        const allKeysSameLength = keysInColumn.length > 0 && 
-          keysInColumn.every(key => key.length === keysInColumn[0].length);
-        const allKeysHaveLength = keysInColumn.length === column.length; // All bindings have keys
         
-        if (allKeysSameLength && allKeysHaveLength) {
-          // Align the macro parts so that keys align within the column
-          // Find how much padding the macro needs to align the key properly
+        // Check if any binding in this column has no key
+        const anyBindingWithoutKey = column.some(b => !b.key);
+        
+        if (anyBindingWithoutKey) {
+          // If any binding has no key, just add a single space between macro and key
+          const formattedBinding = binding.macro + ' ' + binding.key;
+          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
+          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
+        } else {
+          // If all bindings have keys, align the macros within each column
+          // Add padding spaces between macro and key to align macros
           const macroPadding = columnMacroWidths[colIndex] - binding.macro.length;
           const formattedBinding = binding.macro + ' '.repeat(macroPadding + 1) + binding.key;
           const totalPadding = columnWidths[colIndex] - formattedBinding.length;
           return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
-        } else {
-          // For bindings with keys of different lengths, just pad at the end to match column width
-          const totalPadding = columnWidths[colIndex] - binding.width;
-          return binding.original + ' '.repeat(Math.max(0, totalPadding));
         }
       } else {
         // For bindings without keys, just pad to match column width
