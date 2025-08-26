@@ -118,7 +118,7 @@ describe('Formatter Tests', () => {
                     layer_0 {
                         bindings = <
                             &kp Q &kp W &kp E
-                                &kp R
+                                  &kp R
                         >;
                     };
                 };
@@ -163,7 +163,7 @@ describe('Formatter Tests', () => {
                     layer_0 {
                         bindings = <
                             &kp Q
-                                &kp W
+                                  &kp W
                                         &kp E
                             &kp R
                         >;
