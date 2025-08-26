@@ -256,4 +256,68 @@ describe('Formatter Tests', () => {
     
     assert.strictEqual(formatter.formatDocument(input), expected);
   });
+
+    it('2x2 with multiple layers', () => {
+    const input = `
+        #include <dt-bindings/zmk/keys.h>
+
+        // Keymap Template
+        // | * | * |
+        // | * | * |
+
+        / {
+            keymap {
+                compatible = "zmk,keymap";
+                layer_0 {
+                    bindings = <
+                        &kp Q &kp W &kp E &kp R
+                    >;
+                };
+                layer_1 {
+                    bindings = <
+                        &abc Q &kp W &lt E &kp R 
+                    >;
+                };
+                layer_2 {
+                    bindings = <
+                        &abc Q  &kp W 
+                        &spaceb &lt BLUETOOTH N
+                    >;
+                };
+            };
+        };`;
+
+    const expected = `
+        #include <dt-bindings/zmk/keys.h>
+
+        // Keymap Template
+        // | * | * |
+        // | * | * |
+
+        / {
+            keymap {
+                compatible = "zmk,keymap";
+                layer_0 {
+                    bindings = <
+                        &kp Q &kp W
+                        &kp E &kp R
+                    >;
+                };
+                layer_1 {
+                    bindings = <
+                        &abc Q &kp W
+                        &lt  E &kp R
+                    >;
+                };
+                layer_2 {
+                    bindings = <
+                        &abc Q  &kp W          
+                        &spaceb &lt BLUETOOTH N
+                    >;
+                };
+            };
+        };`;
+    
+    assert.strictEqual(formatter.formatDocument(input), expected);
+  });
 });
