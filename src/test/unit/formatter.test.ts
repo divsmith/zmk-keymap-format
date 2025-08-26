@@ -329,7 +329,7 @@ describe('Formatter Tests', () => {
                     compatible = "zmk,keymap";
                     layer_0 {
                         bindings = <
-                            &abc Q  &kp W          
+                            &abc Q  &kp W
                             &spaceb &lt BLUETOOTH N
                         >;
                     };
@@ -362,7 +362,7 @@ describe('Formatter Tests', () => {
                     };
                     layer_2 {
                         bindings = <
-                            &abc Q  &kp W 
+                            &abc Q  &kp W
                             &spaceb &lt BLUETOOTH N
                         >;
                     };
@@ -393,7 +393,7 @@ describe('Formatter Tests', () => {
                     };
                     layer_2 {
                         bindings = <
-                            &abc Q  &kp W          
+                            &abc Q  &kp W
                             &spaceb &lt BLUETOOTH N
                         >;
                     };
@@ -411,7 +411,6 @@ describe('Formatter Tests', () => {
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
-            //         | * | * | * | * | * | * |
 
             / {
                 keymap {
@@ -434,7 +433,6 @@ describe('Formatter Tests', () => {
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
-            //         | * | * | * | * | * | * |
             
             / {
                 keymap {

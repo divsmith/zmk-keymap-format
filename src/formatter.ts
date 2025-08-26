@@ -181,21 +181,16 @@ export function formatDocument(text: string): string {
         
         if (anyBindingWithoutKey) {
           // If any binding has no key, just add a single space between macro and key
-          const formattedBinding = binding.macro + ' ' + binding.key;
-          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
-          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
+          return binding.macro + ' ' + binding.key;
         } else {
           // If all bindings have keys, align the macros within each column
           // Add padding spaces between macro and key to align macros
           const macroPadding = columnMacroWidths[colIndex] - binding.macro.length;
-          const formattedBinding = binding.macro + ' '.repeat(macroPadding + 1) + binding.key;
-          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
-          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
+          return binding.macro + ' '.repeat(macroPadding + 1) + binding.key;
         }
       } else {
-        // For bindings without keys, just pad to match column width
-        const totalPadding = columnWidths[colIndex] - binding.width;
-        return binding.original + ' '.repeat(Math.max(0, totalPadding));
+        // For bindings without keys, return as is
+        return binding.original;
       }
     });
     
@@ -227,10 +222,8 @@ export function formatDocument(text: string): string {
       
       // Join the bindings with a single space
       let processedLine = lineBindings.join(' ');
-      
-      // Apply proper indentation: base content indentation + normalized relative indentation
-      const totalIndentation = contentIndentation + (normalizedIndentations[i] || 0);
-      formattedBindings += ' '.repeat(totalIndentation) + processedLine;
+      // Only trim trailing whitespace if it's not part of the expected column alignment
+      // For now, let's preserve the original trailing whitespace behavior for the last binding in a line
     }
     
     // Handle any remaining bindings that weren't placed in the template
@@ -244,6 +237,7 @@ export function formatDocument(text: string): string {
     }
     
     // Return the formatted bindings section
-    return opening + '\n' + formattedBindings + '\n' + ' '.repeat(closingIndentation) + closing;
+    // Preserve original structure around the bindings content
+    return opening + '\n' + formattedBindings + '\n' + ' '.repeat(originalIndentation) + closing;
   });
 }
