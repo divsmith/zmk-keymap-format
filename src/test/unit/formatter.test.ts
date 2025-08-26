@@ -4,320 +4,320 @@ const formatter = require('../../../out/formatter');
 
 describe('Formatter Tests', () => {
 
-  it('simple 2x2 formatting', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+    it('simple 2x2 formatting', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W &kp E &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W
-                        &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W
+                            &kp E &kp R
+                        >;
+                    };
                 };
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
+
+    it('simple 2x2 with different indentation', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
+
+            // Keymap Template
+            // | * | * |
+            // | * | * |
+
+    / {
+        keymap {
+            compatible = "zmk,keymap";
+            layer_0 {
+                bindings = <
+                    &kp Q &kp W &kp E &kp R
+                >;
             };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
-
-   it('simple 2x2 with different indentation', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
-
-        // Keymap Template
-        // | * | * |
-        // | * | * |
-
-/ {
-    keymap {
-        compatible = "zmk,keymap";
-        layer_0 {
-            bindings = <
-                &kp Q &kp W &kp E &kp R
-            >;
         };
-    };
-};`;
+    };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-/ {
-    keymap {
-        compatible = "zmk,keymap";
-        layer_0 {
-            bindings = <
-                &kp Q &kp W
-                &kp E &kp R
-            >;
+    / {
+        keymap {
+            compatible = "zmk,keymap";
+            layer_0 {
+                bindings = <
+                    &kp Q &kp W
+                    &kp E &kp R
+                >;
+            };
         };
-    };
-};`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+    };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 
-  it('simple 1x3 + 1 formatting', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+    it('simple 1x3 + 1 formatting', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * | * |
-        //     | * |
+            // Keymap Template
+            // | * | * | * |
+            //     | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W &kp E &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * | * |
-        //     | * |
+            // Keymap Template
+            // | * | * | * |
+            //     | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W &kp E
-                              &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W &kp E
+                                &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 
-  it('4x1 with weird spacing', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+    it('4x1 with weird spacing', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | 
-        //     | * |
-        //         | * |
-        // | * |
+            // Keymap Template
+            // | * | 
+            //     | * |
+            //         | * |
+            // | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W &kp E &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | 
-        //     | * |
-        //         | * |
-        // | * |
+            // Keymap Template
+            // | * | 
+            //     | * |
+            //         | * |
+            // | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q
-                              &kp W
-                                    &kp E
-                        &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q
+                                &kp W
+                                        &kp E
+                            &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 
-  it('2x2 with wider columns', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+    it('2x2 with wider columns', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &abc Q &kp W &lt E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &abc Q &kp W &lt E &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &abc Q &kp W
-                        &lt  E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &abc Q &kp W
+                            &lt  E &kp R
+                        >;
+                    };
                 };
-            };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 
-  it('2x2 with wide no param cell', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+    it('2x2 with wide no param cell', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &abc Q  &kp W 
-                        &spaceb &lt BLUETOOTH N
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &abc Q  &kp W 
+                            &spaceb &lt BLUETOOTH N
+                        >;
+                    };
                 };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &abc Q  &kp W          
-                        &spaceb &lt BLUETOOTH N
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &abc Q  &kp W          
+                            &spaceb &lt BLUETOOTH N
+                        >;
+                    };
                 };
-            };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 
     it('2x2 with multiple layers', () => {
-    const input = `
-        #include <dt-bindings/zmk/keys.h>
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W &kp E &kp R
+                        >;
+                    };
+                    layer_1 {
+                        bindings = <
+                            &abc Q &kp W &lt E &kp R 
+                        >;
+                    };
+                    layer_2 {
+                        bindings = <
+                            &abc Q  &kp W 
+                            &spaceb &lt BLUETOOTH N
+                        >;
+                    };
                 };
-                layer_1 {
-                    bindings = <
-                        &abc Q &kp W &lt E &kp R 
-                    >;
-                };
-                layer_2 {
-                    bindings = <
-                        &abc Q  &kp W 
-                        &spaceb &lt BLUETOOTH N
-                    >;
-                };
-            };
-        };`;
+            };`;
 
-    const expected = `
-        #include <dt-bindings/zmk/keys.h>
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
 
-        // Keymap Template
-        // | * | * |
-        // | * | * |
+            // Keymap Template
+            // | * | * |
+            // | * | * |
 
-        / {
-            keymap {
-                compatible = "zmk,keymap";
-                layer_0 {
-                    bindings = <
-                        &kp Q &kp W
-                        &kp E &kp R
-                    >;
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    layer_0 {
+                        bindings = <
+                            &kp Q &kp W
+                            &kp E &kp R
+                        >;
+                    };
+                    layer_1 {
+                        bindings = <
+                            &abc Q &kp W
+                            &lt  E &kp R
+                        >;
+                    };
+                    layer_2 {
+                        bindings = <
+                            &abc Q  &kp W          
+                            &spaceb &lt BLUETOOTH N
+                        >;
+                    };
                 };
-                layer_1 {
-                    bindings = <
-                        &abc Q &kp W
-                        &lt  E &kp R
-                    >;
-                };
-                layer_2 {
-                    bindings = <
-                        &abc Q  &kp W          
-                        &spaceb &lt BLUETOOTH N
-                    >;
-                };
-            };
-        };`;
-    
-    assert.strictEqual(formatter.formatDocument(input), expected);
-  });
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 });
