@@ -173,4 +173,46 @@ describe('Formatter Tests', () => {
     
     assert.strictEqual(formatter.formatDocument(input), expected);
   });
+
+  it('2x2 with wide no param cell', () => {
+    const input = `
+        #include <dt-bindings/zmk/keys.h>
+
+        // Keymap Template
+        // | * | * |
+        // | * | * |
+
+        / {
+            keymap {
+                compatible = "zmk,keymap";
+                layer_0 {
+                    bindings = <
+                        &abc Q &kp W 
+                        &spaceb &lt BLUETOOTH N
+                    >;
+                };
+            };
+        };`;
+
+    const expected = `
+        #include <dt-bindings/zmk/keys.h>
+
+        // Keymap Template
+        // | * | * |
+        // | * | * |
+
+        / {
+            keymap {
+                compatible = "zmk,keymap";
+                layer_0 {
+                    bindings = <
+                        | &abc Q  | &kp W           |
+                        | &spaceb | &lt BLUETOOTH N |
+                    >;
+                };
+            };
+        };`;
+    
+    assert.strictEqual(formatter.formatDocument(input), expected);
+  });
 });
