@@ -35,8 +35,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        | &kp Q | &kp W |
-                        | &kp E | &kp R |
+                        &kp Q &kp W
+                        &kp E &kp R
                     >;
                 };
             };
@@ -76,8 +76,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        | &kp Q | &kp W | &kp E |
-                                | &kp R |
+                        &kp Q &kp W &kp E
+                              &kp R
                     >;
                 };
             };
@@ -121,10 +121,10 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        | &kp Q |
-                                | &kp W |
-                                        | &kp E |
-                        | &kp R |
+                        &kp Q
+                              &kp W
+                                    &kp E
+                        &kp R
                     >;
                 };
             };
@@ -164,8 +164,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        | &abc Q | &kp W |
-                        | &lt  E | &kp R |
+                        &abc Q &kp W
+                        &lt  E &kp R
                     >;
                 };
             };
@@ -187,7 +187,7 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        &abc Q &kp W 
+                        &abc Q  &kp W 
                         &spaceb &lt BLUETOOTH N
                     >;
                 };
@@ -206,8 +206,8 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        | &abc Q  | &kp W           |
-                        | &spaceb | &lt BLUETOOTH N |
+                        &abc Q  &kp W          
+                        &spaceb &lt BLUETOOTH N
                     >;
                 };
             };
