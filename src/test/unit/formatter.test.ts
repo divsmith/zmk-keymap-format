@@ -320,4 +320,56 @@ describe('Formatter Tests', () => {
         
         assert.strictEqual(formatter.formatDocument(input), expected);
     });
+
+    it('more complex example', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
+
+            // Keymap Template
+            // | * | * | * | * | * | * | * | * | * | * |
+            // | * | * | * | * | * | * | * | * | * | * |
+            // | * | * | * | * | * | * | * | * | * | * |
+            //         | * | * | * | * | * | * |
+
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+
+                    default_layer {
+                        bindings = <
+                        &kp Q &kp W &ltf NAV E &kp R &kp T                     &kp Y &kp U &bhm RC(RALT) I &kp O &kp P
+                        &bhm LCTRL A &kp S &bhm LSHFT D &bhm LGUI F &kp G     &kp H &bhm RGUI J &bhm RSFT K &kp L &bhm RCTRL APOS
+                        &bhm LALT Z  &kp X &kp C &ltf ARROWS V                 &kp B &lt BLUETOOTH N &lt MEDIA M &kp COMMA &kp DOT &bhm RALT FSLH
+                        &trans &ltf SYMBOLS ESC &kp RSHFT        &spaceb &ltf NUMBERS RET &trans
+                        >;
+                    };
+                };
+            };`;
+
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
+
+            // Keymap Template
+            // | * | * | * | * | * | * | * | * | * | * |
+            // | * | * | * | * | * | * | * | * | * | * |
+            // | * | * | * | * | * | * | * | * | * | * |
+            //         | * | * | * | * | * | * |
+            
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+                    
+                    default_layer {
+                        bindings = <
+                            &kp  Q       &kp W &ltf NAV E   &kp  R           &kp T     &kp Y           &kp  U           &bhm RC(RALT) I &kp O   &kp P
+                            &bhm LCTRL A &kp S &bhm LSHFT D &bhm LGUI F      &kp G     &kp H           &bhm RGUI J      &bhm RSFT K     &kp L   &bhm RCTRL APOS
+                            &bhm LALT Z  &kp X &kp  C       &ltf ARROWS V    &kp B     &lt BLUETOOTH N &lt  MEDIA M     &kp  COMMA      &kp DOT &bhm RALT FSLH
+                                               &trans       &ltf SYMBOLS ESC &kp RSHFT &spaceb         &ltf NUMBERS RET &trans
+                        >;
+                    };
+                };
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
 });
