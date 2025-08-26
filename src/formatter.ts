@@ -8,6 +8,25 @@ export function formatDocument(text: string): string {
   const bindingsRegex = /(bindings\s*=\s*<)([^>]*)(>)/g;
   
   return text.replace(bindingsRegex, (_match: string, opening: string, bindingsContent: string, closing: string) => {
+    // Find the original indentation of the bindings line
+    let originalIndentation = 24; // Default fallback
+    let closingIndentation = 20;  // Default fallback
+    
+    // Split text into lines to find the bindings line
+    const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim().startsWith('bindings = <')) {
+        // Calculate the indentation of this line
+        const leadingSpaces = lines[i].search(/\S/);
+        originalIndentation = leadingSpaces;
+        closingIndentation = leadingSpaces;
+        break;
+      }
+    }
+    
+    // The formatted content should be indented 4 spaces more than the opening line
+    const contentIndentation = originalIndentation + 4;
+    
     // Clean up the bindings content by normalizing whitespace
     const cleanedContent = bindingsContent.replace(/\s+/g, ' ').trim();
     
@@ -35,7 +54,6 @@ export function formatDocument(text: string): string {
     }
     
     // Parse the keymap template comments
-    const lines = text.split('\n');
     const templateLines: string[] = [];
     
     // Find lines that contain keymap template comments
@@ -211,8 +229,8 @@ export function formatDocument(text: string): string {
       // Join the bindings with a single space
       let processedLine = lineBindings.join(' ');
       
-      // Apply proper indentation: base 24 spaces + normalized relative indentation
-      const totalIndentation = 24 + (normalizedIndentations[i] || 0);
+      // Apply proper indentation: base content indentation + normalized relative indentation
+      const totalIndentation = contentIndentation + (normalizedIndentations[i] || 0);
       formattedBindings += ' '.repeat(totalIndentation) + processedLine;
     }
     
@@ -221,12 +239,12 @@ export function formatDocument(text: string): string {
       if (formattedBindings.length > 0) {
         formattedBindings += '\n';
       }
-      // Add with default indentation (24 spaces)
-      formattedBindings += '                        ' + paddedBindings[bindingIndex];
+      // Add with content indentation
+      formattedBindings += ' '.repeat(contentIndentation) + paddedBindings[bindingIndex];
       bindingIndex++;
     }
     
     // Return the formatted bindings section
-    return opening + '\n' + formattedBindings + '\n                    ' + closing;
+    return opening + '\n' + formattedBindings + '\n' + ' '.repeat(closingIndentation) + closing;
   });
 }
