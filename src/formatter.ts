@@ -52,6 +52,7 @@ export function formatDocument(text: string): string {
     // Find the minimum indentation to establish baseline
     for (const templateLine of templateLines) {
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2);
+      // Find the position of the first non-space character
       const leadingSpaces = contentAfterComment.search(/\S/);
       relativeIndentations.push(leadingSpaces);
       if (leadingSpaces < minIndentation && leadingSpaces >= 0) {
@@ -65,8 +66,8 @@ export function formatDocument(text: string): string {
     }
     
     // Normalize relative indentations (subtract minimum to get relative offsets)
-    // Then multiply by 2 to match expected spacing pattern
-    const normalizedIndentations = relativeIndentations.map(indent => (indent - minIndentation) * 2);
+    // Then multiply by 1.5 to match expected spacing pattern (each 2 character indent in template adds 3 spaces)
+    const normalizedIndentations = relativeIndentations.map(indent => Math.floor((indent - minIndentation) * 1.5));
     
     // Parse bindings into macro + key components for padding calculation
     const parsedBindings = bindings.map(binding => {
@@ -184,7 +185,7 @@ export function formatDocument(text: string): string {
     // Reset bindingIndex for the formatting pass
     bindingIndex = 0;
     
-    // Create the formatted bindings by replacing * with bindings
+    // Create the formatted bindings without | characters, just space separated
     let formattedBindings = '';
     
     // Process each template line
@@ -197,14 +198,18 @@ export function formatDocument(text: string): string {
       const templateLine = templateLines[i];
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
       
-      // Replace all * with corresponding bindings in this line
-      let processedLine = contentAfterComment;
+      // Count the number of stars in this line to determine how many bindings go on this line
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
       
+      // Create an array to hold the bindings for this line
+      const lineBindings: string[] = [];
       for (let j = 0; j < starCount && bindingIndex < paddedBindings.length; j++) {
-        processedLine = processedLine.replace('*', paddedBindings[bindingIndex]);
+        lineBindings.push(paddedBindings[bindingIndex]);
         bindingIndex++;
       }
+      
+      // Join the bindings with a single space
+      let processedLine = lineBindings.join(' ');
       
       // Apply proper indentation: base 24 spaces + normalized relative indentation
       const totalIndentation = 24 + (normalizedIndentations[i] || 0);
