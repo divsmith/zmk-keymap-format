@@ -16,17 +16,21 @@ export function formatDocument(text: string): string {
     
     // Group tokens into bindings (each binding starts with &)
     const bindings: string[] = [];
-    for (let i = 0; i < tokens.length; i++) {
+    let i = 0;
+    while (i < tokens.length) {
       if (tokens[i].startsWith('&')) {
         // This is the start of a binding
-        if (i + 1 < tokens.length && !tokens[i + 1].startsWith('&')) {
-          // Next token is part of this binding
-          bindings.push(tokens[i] + ' ' + tokens[i + 1]);
-          i++; // Skip the next token
-        } else {
-          // This is a standalone binding (shouldn't happen in practice)
-          bindings.push(tokens[i]);
+        let binding = tokens[i];
+        i++;
+        // Collect all subsequent tokens that don't start with & (parameters)
+        while (i < tokens.length && !tokens[i].startsWith('&')) {
+          binding += ' ' + tokens[i];
+          i++;
         }
+        bindings.push(binding);
+      } else {
+        // Skip any token that doesn't start with & (shouldn't happen in valid input)
+        i++;
       }
     }
     
@@ -50,9 +54,14 @@ export function formatDocument(text: string): string {
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2);
       const leadingSpaces = contentAfterComment.search(/\S/);
       relativeIndentations.push(leadingSpaces);
-      if (leadingSpaces < minIndentation) {
+      if (leadingSpaces < minIndentation && leadingSpaces >= 0) {
         minIndentation = leadingSpaces;
       }
+    }
+    
+    // If no valid indentation found, set to 0
+    if (minIndentation === Infinity) {
+      minIndentation = 0;
     }
     
     // Normalize relative indentations (subtract minimum to get relative offsets)
@@ -62,11 +71,14 @@ export function formatDocument(text: string): string {
     // Parse bindings into macro + key components for padding calculation
     const parsedBindings = bindings.map(binding => {
       const parts = binding.split(' ');
-      if (parts.length === 2) {
+      if (parts.length >= 2) {
+        // Macro is the first part, key is everything else joined with spaces
+        const macro = parts[0];
+        const key = parts.slice(1).join(' ');
         return {
           original: binding,
-          macro: parts[0],
-          key: parts[1],
+          macro: macro,
+          key: key,
           width: binding.length
         };
       }
@@ -98,20 +110,34 @@ export function formatDocument(text: string): string {
       }
     }
     
-    // Calculate maximum width for each column
+    // Calculate maximum width for the entire binding and for macro/key parts separately for each column
     const columnWidths: number[] = columnBindings.map(column => {
-      return Math.max(...column.map(binding => binding.width));
+      return column.length > 0 ? Math.max(...column.map(binding => binding.width)) : 0;
     });
+    
+    const columnMacroWidths: number[] = [];
+    const columnKeyWidths: number[] = [];
+    
+    for (let i = 0; i < columnBindings.length; i++) {
+      const column = columnBindings[i];
+      if (column.length > 0) {
+        columnMacroWidths[i] = Math.max(...column.map(binding => binding.macro.length));
+        columnKeyWidths[i] = Math.max(...column.map(binding => binding.key.length));
+      } else {
+        columnMacroWidths[i] = 0;
+        columnKeyWidths[i] = 0;
+      }
+    }
     
     // Create padded bindings
     const paddedBindings: string[] = parsedBindings.map((binding, index) => {
       // Find which column this binding is in
       let colIndex = 0;
-      let bindingPosition = 0;
       
       // Recalculate position to find column
       bindingIndex = 0;
-      for (let i = 0; i < templateLines.length; i++) {
+      let found = false;
+      for (let i = 0; i < templateLines.length && !found; i++) {
         const templateLine = templateLines[i];
         const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
         const starCount = (contentAfterComment.match(/\*/g) || []).length;
@@ -119,25 +145,40 @@ export function formatDocument(text: string): string {
         for (let j = 0; j < starCount && bindingIndex < parsedBindings.length; j++) {
           if (bindingIndex === index) {
             colIndex = j;
-            bindingPosition = bindingIndex;
+            found = true;
             break;
           }
           bindingIndex++;
         }
-        if (bindingIndex === index) break;
       }
       
-      // If this column has a max width and this binding is shorter, add padding
-      if (columnWidths[colIndex] && binding.width < columnWidths[colIndex]) {
-        const widthDiff = columnWidths[colIndex] - binding.width;
-        // For &kp bindings, add the extra space between macro and key
-        if (binding.macro === '&kp' && binding.key) {
-          return `${binding.macro}${' '.repeat(widthDiff + 1)}${binding.key}`;
+      // Format the binding with proper alignment
+      if (binding.key) {
+        // For bindings, check if we need to align keys within the column
+        // Only align macros if all keys in the column have the same length
+        const column = columnBindings[colIndex] || [];
+        const keysInColumn = column.filter(b => b.key).map(b => b.key);
+        const allKeysSameLength = keysInColumn.length > 0 && 
+          keysInColumn.every(key => key.length === keysInColumn[0].length);
+        const allKeysHaveLength = keysInColumn.length === column.length; // All bindings have keys
+        
+        if (allKeysSameLength && allKeysHaveLength) {
+          // Align the macro parts so that keys align within the column
+          // Find how much padding the macro needs to align the key properly
+          const macroPadding = columnMacroWidths[colIndex] - binding.macro.length;
+          const formattedBinding = binding.macro + ' '.repeat(macroPadding + 1) + binding.key;
+          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
+          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
+        } else {
+          // For bindings with keys of different lengths, just pad at the end to match column width
+          const totalPadding = columnWidths[colIndex] - binding.width;
+          return binding.original + ' '.repeat(Math.max(0, totalPadding));
         }
-        // For other bindings, add space at the end
-        return `${binding.original}${' '.repeat(widthDiff)}`;
+      } else {
+        // For bindings without keys, just pad to match column width
+        const totalPadding = columnWidths[colIndex] - binding.width;
+        return binding.original + ' '.repeat(Math.max(0, totalPadding));
       }
-      return binding.original;
     });
     
     // Reset bindingIndex for the formatting pass
@@ -166,7 +207,7 @@ export function formatDocument(text: string): string {
       }
       
       // Apply proper indentation: base 24 spaces + normalized relative indentation
-      const totalIndentation = 24 + normalizedIndentations[i];
+      const totalIndentation = 24 + (normalizedIndentations[i] || 0);
       formattedBindings += ' '.repeat(totalIndentation) + processedLine;
     }
     
@@ -181,6 +222,6 @@ export function formatDocument(text: string): string {
     }
     
     // Return the formatted bindings section
-    return `${opening}\n${formattedBindings}\n                    ${closing}`;
+    return opening + '\n' + formattedBindings + '\n                    ' + closing;
   });
 }

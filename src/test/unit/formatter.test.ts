@@ -146,7 +146,7 @@ describe('Formatter Tests', () => {
                 compatible = "zmk,keymap";
                 layer_0 {
                     bindings = <
-                        &abc Q &kp W &kp E &kp R
+                        &abc Q &kp W &lt E &kp R
                     >;
                 };
             };
@@ -165,7 +165,7 @@ describe('Formatter Tests', () => {
                 layer_0 {
                     bindings = <
                         | &abc Q | &kp W |
-                        | &kp  E | &kp R |
+                        | &lt  E | &kp R |
                     >;
                 };
             };
