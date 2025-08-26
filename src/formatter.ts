@@ -59,8 +59,91 @@ export function formatDocument(text: string): string {
     // Then multiply by 2 to match expected spacing pattern
     const normalizedIndentations = relativeIndentations.map(indent => (indent - minIndentation) * 2);
     
-    // Create the formatted bindings by replacing * with bindings
+    // Parse bindings into macro + key components for padding calculation
+    const parsedBindings = bindings.map(binding => {
+      const parts = binding.split(' ');
+      if (parts.length === 2) {
+        return {
+          original: binding,
+          macro: parts[0],
+          key: parts[1],
+          width: binding.length
+        };
+      }
+      return {
+        original: binding,
+        macro: binding,
+        key: '',
+        width: binding.length
+      };
+    });
+    
+    // Group bindings by column for width calculation
+    const columnBindings: {original: string, macro: string, key: string, width: number}[][] = [];
     let bindingIndex = 0;
+    
+    // First pass: group bindings by column
+    for (let i = 0; i < templateLines.length; i++) {
+      const templateLine = templateLines[i];
+      const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
+      const starCount = (contentAfterComment.match(/\*/g) || []).length;
+      
+      for (let j = 0; j < starCount && bindingIndex < parsedBindings.length; j++) {
+        const colIndex = j;
+        if (!columnBindings[colIndex]) {
+          columnBindings[colIndex] = [];
+        }
+        columnBindings[colIndex].push(parsedBindings[bindingIndex]);
+        bindingIndex++;
+      }
+    }
+    
+    // Calculate maximum width for each column
+    const columnWidths: number[] = columnBindings.map(column => {
+      return Math.max(...column.map(binding => binding.width));
+    });
+    
+    // Create padded bindings
+    const paddedBindings: string[] = parsedBindings.map((binding, index) => {
+      // Find which column this binding is in
+      let colIndex = 0;
+      let bindingPosition = 0;
+      
+      // Recalculate position to find column
+      bindingIndex = 0;
+      for (let i = 0; i < templateLines.length; i++) {
+        const templateLine = templateLines[i];
+        const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
+        const starCount = (contentAfterComment.match(/\*/g) || []).length;
+        
+        for (let j = 0; j < starCount && bindingIndex < parsedBindings.length; j++) {
+          if (bindingIndex === index) {
+            colIndex = j;
+            bindingPosition = bindingIndex;
+            break;
+          }
+          bindingIndex++;
+        }
+        if (bindingIndex === index) break;
+      }
+      
+      // If this column has a max width and this binding is shorter, add padding
+      if (columnWidths[colIndex] && binding.width < columnWidths[colIndex]) {
+        const widthDiff = columnWidths[colIndex] - binding.width;
+        // For &kp bindings, add the extra space between macro and key
+        if (binding.macro === '&kp' && binding.key) {
+          return `${binding.macro}${' '.repeat(widthDiff + 1)}${binding.key}`;
+        }
+        // For other bindings, add space at the end
+        return `${binding.original}${' '.repeat(widthDiff)}`;
+      }
+      return binding.original;
+    });
+    
+    // Reset bindingIndex for the formatting pass
+    bindingIndex = 0;
+    
+    // Create the formatted bindings by replacing * with bindings
     let formattedBindings = '';
     
     // Process each template line
@@ -77,8 +160,8 @@ export function formatDocument(text: string): string {
       let processedLine = contentAfterComment;
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
       
-      for (let j = 0; j < starCount && bindingIndex < bindings.length; j++) {
-        processedLine = processedLine.replace('*' , bindings[bindingIndex]);
+      for (let j = 0; j < starCount && bindingIndex < paddedBindings.length; j++) {
+        processedLine = processedLine.replace('*', paddedBindings[bindingIndex]);
         bindingIndex++;
       }
       
@@ -88,12 +171,12 @@ export function formatDocument(text: string): string {
     }
     
     // Handle any remaining bindings that weren't placed in the template
-    while (bindingIndex < bindings.length) {
+    while (bindingIndex < paddedBindings.length) {
       if (formattedBindings.length > 0) {
         formattedBindings += '\n';
       }
       // Add with default indentation (24 spaces)
-      formattedBindings += '                        ' + bindings[bindingIndex];
+      formattedBindings += '                        ' + paddedBindings[bindingIndex];
       bindingIndex++;
     }
     
