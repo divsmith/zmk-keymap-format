@@ -489,7 +489,7 @@ describe('Formatter Tests', () => {
         assert.strictEqual(formatter.formatDocument(input), expected);
     });
 
-    xit('more complex example', () => {
+    it('more complex example', () => {
         const input = `
             #include <dt-bindings/zmk/keys.h>
 
