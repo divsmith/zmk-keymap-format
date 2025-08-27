@@ -113,9 +113,9 @@ export function formatDocument(text: string): string {
     
     // First pass: group bindings by column
     // We need to understand the actual column positions from the template
-    const lineStartPositions: number[] = [];
+    const lineColumnOffsets: number[] = [];
     
-    // Calculate the starting column position for each line
+    // Calculate the starting column offset for each line based on indentation
     for (let i = 0; i < templateLines.length; i++) {
       const templateLine = templateLines[i];
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2);
@@ -123,7 +123,7 @@ export function formatDocument(text: string): string {
       const leadingSpaces = contentAfterComment.search(/\S/);
       // Convert character position to approximate column position
       // (assuming each |*| is about 4 characters wide)
-      lineStartPositions[i] = Math.floor(leadingSpaces / 4);
+      lineColumnOffsets[i] = Math.max(0, Math.round(leadingSpaces / 4));
     }
     
     // Group bindings by their actual column position
@@ -132,11 +132,11 @@ export function formatDocument(text: string): string {
       const templateLine = templateLines[i];
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
-      const lineStartCol = lineStartPositions[i];
+      const lineColumnOffset = lineColumnOffsets[i];
       
       for (let j = 0; j < starCount && bindingIndex < parsedBindings.length; j++) {
         // Calculate the actual column index by adding line offset
-        const colIndex = lineStartCol + j;
+        const colIndex = lineColumnOffset + j;
         if (!columnBindings[colIndex]) {
           columnBindings[colIndex] = [];
         }
@@ -198,20 +198,22 @@ export function formatDocument(text: string): string {
         if (anyBindingWithoutKey) {
           // If any binding has no key, just add a single space between macro and key
           const formattedBinding = binding.macro + ' ' + binding.key;
-          const totalPadding = columnWidths[colIndex] - formattedBinding.length;
-          return formattedBinding + ' '.repeat(Math.max(0, totalPadding));
+          const totalPadding = Math.max(0, columnWidths[colIndex] - formattedBinding.length);
+          return formattedBinding + ' '.repeat(totalPadding);
         } else {
           // If all bindings have keys, align the macros and keys within each column separately
-          const macroPadding = columnMacroWidths[colIndex] - binding.macro.length;
-          const keyPadding = columnKeyWidths[colIndex] - binding.key.length;
+          const macroPadding = Math.max(0, columnMacroWidths[colIndex] - binding.macro.length);
+          const keyPadding = Math.max(0, columnKeyWidths[colIndex] - binding.key.length);
           // Add a space between macro and key, then pad both parts
           const formattedBinding = binding.macro + ' '.repeat(macroPadding + 1) + binding.key + ' '.repeat(keyPadding);
-          return formattedBinding;
+          // Make sure the formatted binding matches the column width
+          const totalPadding = Math.max(0, columnWidths[colIndex] - formattedBinding.length);
+          return formattedBinding + ' '.repeat(totalPadding);
         }
       } else {
         // For bindings without keys, just pad to match column width
-        const totalPadding = columnWidths[colIndex] - binding.width;
-        return binding.original + ' '.repeat(Math.max(0, totalPadding));
+        const totalPadding = Math.max(0, columnWidths[colIndex] - binding.width);
+        return binding.original + ' '.repeat(totalPadding);
       }
     });
     
@@ -233,7 +235,7 @@ export function formatDocument(text: string): string {
       
       // Count the number of stars in this line to determine how many bindings go on this line
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
-      const lineStartCol = lineStartPositions[i];
+      const lineColumnOffset = lineColumnOffsets[i];
       
       // Create an array to hold the bindings for this line
       const lineBindings: string[] = [];

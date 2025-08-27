@@ -444,6 +444,50 @@ describe('Formatter Tests', () => {
         assert.strictEqual(formatter.formatDocument(input), expected);
     });
 
+    it('slightly more complex example', () => {
+        const input = `
+            #include <dt-bindings/zmk/keys.h>
+
+            // Keymap Template
+            // | * | * | * | * | * | * | * | * | * | * |
+            //         | * | * | * | * | * | * | 
+
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+
+                    default_layer {
+                        bindings = <
+                        &bhm LALT Z  &kp X &kp C &ltf ARROWS V                 &kp B &lt BLUETOOTH N &lt MEDIA M &kp COMMA &kp DOT &bhm RALT FSLH
+                        &trans &escTap SYMBOLS ESC &kp RSHFT        &spaceb &ltf NUMBERS RET &trans
+                        >;
+                    };
+                };
+            };`;
+
+        const expected = `
+            #include <dt-bindings/zmk/keys.h>
+
+            // Keymap Template
+            // | * | * | * | * | * | * | * | * | * | * |
+            //         | * | * | * | * | * | * | 
+
+            / {
+                keymap {
+                    compatible = "zmk,keymap";
+
+                    default_layer {
+                        bindings = <
+                            &bhm LALT Z  &kp X &kp  C       &ltf ARROWS V       &kp B     &lt BLUETOOTH N &lt  MEDIA M     &kp  COMMA      &kp DOT &bhm RALT FSLH
+                                               &trans       &escTap SYMBOLS ESC &kp RSHFT &spaceb         &ltf NUMBERS RET &trans
+                        >;
+                    };
+                };
+            };`;
+        
+        assert.strictEqual(formatter.formatDocument(input), expected);
+    });
+
     xit('more complex example', () => {
         const input = `
             #include <dt-bindings/zmk/keys.h>
