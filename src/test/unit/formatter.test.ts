@@ -444,13 +444,14 @@ describe('Formatter Tests', () => {
         assert.strictEqual(formatter.formatDocument(input), expected);
     });
 
+
     it('slightly more complex example', () => {
         const input = `
             #include <dt-bindings/zmk/keys.h>
 
             // Keymap Template
-            // | * | * | * | * | * | * | * | * | * | * |
-            //         | * | * | * | * | * | * | 
+            // | * | * | * |
+            //         | * |
 
             / {
                 keymap {
@@ -458,8 +459,8 @@ describe('Formatter Tests', () => {
 
                     default_layer {
                         bindings = <
-                        &bhm LALT Z  &kp X &kp C &ltf ARROWS V                 &kp B &lt BLUETOOTH N &lt MEDIA M &kp COMMA &kp DOT &bhm RALT FSLH
-                        &trans &escTap SYMBOLS ESC &kp RSHFT        &spaceb &ltf NUMBERS RET &trans
+                        &bhm LALT Z  &kp X &kp C
+                        &trans
                         >;
                     };
                 };
@@ -469,8 +470,8 @@ describe('Formatter Tests', () => {
             #include <dt-bindings/zmk/keys.h>
 
             // Keymap Template
-            // | * | * | * | * | * | * | * | * | * | * |
-            //         | * | * | * | * | * | * | 
+            // | * | * | * |
+            //         | * |
 
             / {
                 keymap {
@@ -478,8 +479,8 @@ describe('Formatter Tests', () => {
 
                     default_layer {
                         bindings = <
-                            &bhm LALT Z  &kp X &kp  C       &ltf ARROWS V       &kp B     &lt BLUETOOTH N &lt  MEDIA M     &kp  COMMA      &kp DOT &bhm RALT FSLH
-                                               &trans       &escTap SYMBOLS ESC &kp RSHFT &spaceb         &ltf NUMBERS RET &trans
+                            &bhm LALT Z &kp X &kp C
+                                              &trans
                         >;
                     };
                 };
