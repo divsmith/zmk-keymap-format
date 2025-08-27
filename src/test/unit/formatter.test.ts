@@ -403,7 +403,7 @@ describe('Formatter Tests', () => {
         assert.strictEqual(formatter.formatDocument(input), expected);
     });
 
-    xit('more complex example', () => {
+    it('more complex example', () => {
         const input = `
             #include <dt-bindings/zmk/keys.h>
 
@@ -433,11 +433,11 @@ describe('Formatter Tests', () => {
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
             // | * | * | * | * | * | * | * | * | * | * |
-            
+
             / {
                 keymap {
                     compatible = "zmk,keymap";
-                    
+
                     default_layer {
                         bindings = <
                             &kp  Q       &kp W &ltf NAV E   &kp  R        &kp T &kp Y           &kp  U       &bhm RC(RALT) I &kp O   &kp  P
