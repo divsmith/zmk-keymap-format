@@ -1,0 +1,1 @@
+Do not attempt to read or modify any files that are ignored by git.
