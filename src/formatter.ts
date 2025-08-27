@@ -112,13 +112,31 @@ export function formatDocument(text: string): string {
     let bindingIndex = 0;
     
     // First pass: group bindings by column
+    // We need to understand the actual column positions from the template
+    const lineStartPositions: number[] = [];
+    
+    // Calculate the starting column position for each line
+    for (let i = 0; i < templateLines.length; i++) {
+      const templateLine = templateLines[i];
+      const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2);
+      // Find the position of the first non-space character after //
+      const leadingSpaces = contentAfterComment.search(/\S/);
+      // Convert character position to approximate column position
+      // (assuming each |*| is about 4 characters wide)
+      lineStartPositions[i] = Math.floor(leadingSpaces / 4);
+    }
+    
+    // Group bindings by their actual column position
+    bindingIndex = 0;
     for (let i = 0; i < templateLines.length; i++) {
       const templateLine = templateLines[i];
       const contentAfterComment = templateLine.substring(templateLine.indexOf('//') + 2).trim();
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
+      const lineStartCol = lineStartPositions[i];
       
       for (let j = 0; j < starCount && bindingIndex < parsedBindings.length; j++) {
-        const colIndex = j;
+        // Calculate the actual column index by adding line offset
+        const colIndex = lineStartCol + j;
         if (!columnBindings[colIndex]) {
           columnBindings[colIndex] = [];
         }
@@ -215,6 +233,7 @@ export function formatDocument(text: string): string {
       
       // Count the number of stars in this line to determine how many bindings go on this line
       const starCount = (contentAfterComment.match(/\*/g) || []).length;
+      const lineStartCol = lineStartPositions[i];
       
       // Create an array to hold the bindings for this line
       const lineBindings: string[] = [];
