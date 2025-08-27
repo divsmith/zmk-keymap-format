@@ -10,7 +10,6 @@ export function formatDocument(text: string): string {
   return text.replace(bindingsRegex, (_match: string, opening: string, bindingsContent: string, closing: string) => {
     // Find the original indentation of the bindings line
     let originalIndentation = 24; // Default fallback
-    let closingIndentation = 20;  // Default fallback
     
     // Split text into lines to find the bindings line
     const lines = text.split('\n');
@@ -19,7 +18,6 @@ export function formatDocument(text: string): string {
         // Calculate the indentation of this line
         const leadingSpaces = lines[i].search(/\S/);
         originalIndentation = leadingSpaces;
-        closingIndentation = leadingSpaces;
         break;
       }
     }
